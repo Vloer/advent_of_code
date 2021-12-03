@@ -1,12 +1,10 @@
-from typing import List
-import os
+from __future__ import annotations
+from pathlib import Path
 
-ROOT = "C:\\Users\\RuweBo01\\repos\\aoc\\inputs"
-input_filee = "d2.txt"
-input_file = os.path.join(ROOT, input_filee)
+input_file = Path(__file__).parent / "inputs" / "d2.txt"
 
 
-def parse_input(txt_file: str = input_file) -> List[int]:
+def parse_input(txt_file: str = input_file) -> list[int]:
     with open(txt_file, 'r') as f:
         return(f.read().split("\n"))
 
