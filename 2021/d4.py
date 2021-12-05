@@ -59,5 +59,5 @@ def solve2(boards, numbers_drawn, part2) -> None:
     print(f"Answer 2: {result}")
 
 
-# solve1(boards, numbers_drawn, False)
+solve1(boards, numbers_drawn, False)
 solve2(boards, numbers_drawn, True)
