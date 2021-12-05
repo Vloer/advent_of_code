@@ -29,25 +29,35 @@ def check_board(b: np.array) -> bool:
     return False
 
 
-def play_bingo(boards: list[list[int]], numbers_drawn: list[int]) -> tuple(np.array, int):
+def play_bingo(boards: list[list[int]], numbers_drawn: list[int], part2=False) -> tuple(np.array, int):
+    idx_to_skip = []
     for num in numbers_drawn:
-        for board in boards:
-            if num in board:
-                y, x = np.where(board == num)
-                board[y, x] = insert_number
-                if check_board(board):
-                    return(board, num)
+        for i in range(len(boards)):
+            if i not in idx_to_skip:
+                board = boards[i]
+                if num in board:
+                    y, x = np.where(board == num)
+                    board[y, x] = insert_number
+                    if check_board(board):
+                        if not part2:
+                            return(board, num)
+                        idx_to_skip.append(i)
+                        last_board = board
+                        last_num = num
+    return(last_board, last_num)
 
 
-def solve1(boards, numbers_drawn) -> None:
-    board, num = play_bingo(boards, numbers_drawn)
+def solve1(boards, numbers_drawn, part2) -> None:
+    board, num = play_bingo(boards, numbers_drawn, part2)
     result = num * np.sum(board, where=(board != insert_number))
     print(f"Answer 1: {result}")
 
 
-def solve2() -> None:
-    result = 0
+def solve2(boards, numbers_drawn, part2) -> None:
+    board, num = play_bingo(boards, numbers_drawn, part2)
+    result = num * np.sum(board, where=(board != insert_number))
     print(f"Answer 2: {result}")
 
 
-solve1(boards, numbers_drawn)
+# solve1(boards, numbers_drawn, False)
+solve2(boards, numbers_drawn, True)
