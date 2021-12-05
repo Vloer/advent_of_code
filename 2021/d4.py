@@ -14,6 +14,7 @@ inp = parse_input()
 numbers_drawn = list(map(int, inp[0].split(",")))
 boards = []
 new_board = []
+insert_number = 0
 for i in range(2, len(inp)):
     if inp[i] != "":
         new_board.append(list(map(int, inp[i].split())))
@@ -23,23 +24,24 @@ for i in range(2, len(inp)):
 
 
 def check_board(b: np.array) -> bool:
-    if any(b.sum(axis=0) == len(b) * 1000):
+    if any(b.sum(axis=0) == len(b) * insert_number) or any(b.sum(axis=1) == len(b) * insert_number):
         return True
     return False
 
 
-
-def solve1() -> None:
-    result = 0
+def play_bingo(boards: list[list[int]], numbers_drawn: list[int]) -> tuple(np.array, int):
     for num in numbers_drawn:
         for board in boards:
             if num in board:
                 y, x = np.where(board == num)
-                board[y, x] = 1000
+                board[y, x] = insert_number
                 if check_board(board):
-                    print(board)
-                    return board
+                    return(board, num)
 
+
+def solve1(boards, numbers_drawn) -> None:
+    board, num = play_bingo(boards, numbers_drawn)
+    result = num * np.sum(board, where=(board != insert_number))
     print(f"Answer 1: {result}")
 
 
@@ -48,4 +50,4 @@ def solve2() -> None:
     print(f"Answer 2: {result}")
 
 
-solve1()
+solve1(boards, numbers_drawn)
