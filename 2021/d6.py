@@ -16,10 +16,9 @@ inp = parse_input()
 test_set = [1, 2, 3, 0]
 
 
-
 def subtract_num(fish: np.array) -> np.array:
     fish = np.append(fish, np.full(np.count_nonzero(fish == 0), 9))
-    fish = np.where(fish==0,6,fish-1)
+    fish = np.where(fish == 0, 6, fish-1)
     return fish
 
 
@@ -33,7 +32,7 @@ def solve1(inp: list[int], days: int) -> None:
 
 def solve2(inp: list[int], days: int) -> None:
     inp = Counter(inp)
-    result=0
+    result = 0
     for day in range(days):
         inp_count = Counter()
         for k, v in inp.items():
