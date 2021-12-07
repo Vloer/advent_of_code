@@ -32,14 +32,11 @@ def solve2(data: list[int]) -> None:
     result = inf
     med = int(statistics.median(data))
     max_iter = abs(max(inp) - med)
-    no_change_ind = 0
     for i in range(max_iter + 1):
         temp_result = sum([fuel_per_step(x, med + i) for x in data])
         temp_result2 = sum([fuel_per_step(x, med - i) for x in data])
-        new_result = min(result, temp_result, temp_result2)
-        if new_result == result:
-            no_change_ind += 1
-        if no_change_ind == 50:
+        new_result = min(temp_result, temp_result2)
+        if new_result > result:
             break
         result = new_result
         print(f"Tried {i}: {temp_result}, {temp_result2}, current result is {result}")
