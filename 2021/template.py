@@ -14,9 +14,13 @@ inp = parse_input()
 
 def solve1() -> None:
     result = 0
-    print(f"Answer 1: {result}")
+    return result
 
 
 def solve2() -> None:
     result = 0
-    print(f"Answer 2: {result}")
+    return result
+
+
+print(f"Answer 1: {solve1(inp)}")
+print(f"Answer 2: {solve2(inp)}")

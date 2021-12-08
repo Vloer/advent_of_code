@@ -2,6 +2,7 @@ from __future__ import annotations
 from pathlib import Path
 import statistics
 from math import inf
+from datetime import datetime
 
 input_file = Path(__file__).parent / "inputs" / "d7.txt"
 
@@ -13,6 +14,7 @@ def parse_input(txt_file: str = input_file) -> list[int]:
 
 inp = parse_input()
 testdata = [16,1,2,0,4,2,7,1,2,14]
+test2 = [10000,100, 10, 10, 10, 10, 10, 10, 10,10000]
 
 
 def fuel_per_step(start: int, end: int) -> int:
@@ -25,7 +27,7 @@ def solve1(data: list[int]) -> None:
     result = 0
     med = int(statistics.median(data))
     result = sum([abs(i-med) for i in data])
-    print(f"Answer 1: {result}")
+    return result
 
 
 def solve2(data: list[int]) -> None:
@@ -40,7 +42,10 @@ def solve2(data: list[int]) -> None:
             break
         result = new_result
         print(f"Tried {i}: {temp_result}, {temp_result2}, current result is {result}")
-    print(f"Answer 2: {result}")
+    return result
 
-solve1(inp)
-solve2(inp)
+
+start=datetime.now()
+print(f"Answer 1: {solve1(inp)}")
+print(f"Answer 2: {solve2(inp)}")
+print(datetime.now()-start)
