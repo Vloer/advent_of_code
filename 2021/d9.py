@@ -34,6 +34,44 @@ def get_neighbours(mat: list[list[int]], curpos: tuple(int)) -> list[int]:
     return adjacent
 
 
+def continue_upwards(mat: list[list[int]], starting_pos: tuple(int), size=1, positions_already_checked=[]):
+    row = starting_pos[0]
+    pos = starting_pos[1]
+    height = mat[row][pos]
+    # go right
+    if pos + 1 < len(mat[0]):
+        new_height = mat[row][pos + 1]
+        if new_height > height and new_height < 9 and (row, pos+1) not in positions_already_checked:
+            size += 1
+            size = continue_upwards(mat, (row, pos + 1), size, positions_already_checked)
+            positions_already_checked.append((row, pos+1))
+
+    # go left
+    if pos > 0:
+        new_height = mat[row][pos - 1]
+        if new_height > height and new_height < 9 and (row, pos-1) not in positions_already_checked:
+            size += 1
+            size = continue_upwards(mat, (row, pos - 1), size, positions_already_checked)
+            positions_already_checked.append((row, pos-1))
+
+    # go down
+    if row + 1 < len(mat):
+        new_height = mat[row + 1][pos]
+        if new_height > height and new_height < 9 and (row+1, pos) not in positions_already_checked:
+            size += 1
+            size = continue_upwards(mat, (row + 1, pos), size, positions_already_checked)
+            positions_already_checked.append((row+1, pos))
+
+    # go up
+    if row > 0:
+        new_height = mat[row - 1][pos]
+        if new_height > height and new_height < 9 and (row-1, pos) not in positions_already_checked:
+            size += 1
+            size = continue_upwards(mat, (row - 1, pos), size, positions_already_checked)
+            positions_already_checked.append((row-1, pos))
+    return size
+
+
 def solve1(heightmap: list[list[int]]) -> int:
     result = 0
     for row in range(len(heightmap)):
@@ -46,13 +84,16 @@ def solve1(heightmap: list[list[int]]) -> int:
 
 
 def solve2(heightmap: list[list[int]]) -> int:
-    '''
-    als je een laagste vind ga vanuit daar recursive kijken of je nog omhoog kan <9
-    dit voor elk getal tot je een 9 tegen komt of niet omhoog kan
-    '''
-
-    result = 0
-    return result
+    result = []
+    for row in range(len(heightmap)):
+        for pos in range(len(heightmap[0])):
+            cur = heightmap[row][pos]
+            adj = get_neighbours(heightmap, (row, pos))
+            if all(i > cur for i in adj):
+                result.append(continue_upwards(heightmap, (row, pos)))
+    result.sort(reverse=True)
+    final_result = math.prod(result[:3])
+    return final_result
 
 
 print(f"Answer 1: {solve1(inp)}")
