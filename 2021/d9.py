@@ -47,7 +47,8 @@ def solve1(heightmap: list[list[int]]) -> int:
 
 def solve2(heightmap: list[list[int]]) -> int:
     '''
-    als je een laagste vind ga vanuit daar kijken of elk
+    als je een laagste vind ga vanuit daar recursive kijken of je nog omhoog kan <9
+    dit voor elk getal tot je een 9 tegen komt of niet omhoog kan
     '''
 
     result = 0
