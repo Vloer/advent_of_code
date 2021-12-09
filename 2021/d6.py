@@ -1,6 +1,5 @@
 from __future__ import annotations
 from pathlib import Path
-import math
 from collections import Counter
 import numpy as np
 
