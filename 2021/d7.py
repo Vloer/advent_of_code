@@ -13,8 +13,8 @@ def parse_input(txt_file: str = input_file) -> list[int]:
 
 
 inp = parse_input()
-testdata = [16,1,2,0,4,2,7,1,2,14]
-test2 = [10000,100, 10, 10, 10, 10, 10, 10, 10,10000]
+testdata = [16, 1, 2, 0, 4, 2, 7, 1, 2, 14]
+test2 = [10000, 100, 10, 10, 10, 10, 10, 10, 10, 10000]
 
 
 def fuel_per_step(start: int, end: int) -> int:
@@ -41,11 +41,12 @@ def solve2(data: list[int]) -> None:
         if new_result > result:
             break
         result = new_result
-        print(f"Tried {i}: {temp_result}, {temp_result2}, current result is {result}")
+        print(
+            f"Tried {i}: {temp_result}, {temp_result2}, current result is {result}")
     return result
 
 
-start=datetime.now()
+start = datetime.now()
 print(f"Answer 1: {solve1(inp)}")
 print(f"Answer 2: {solve2(inp)}")
 print(datetime.now()-start)

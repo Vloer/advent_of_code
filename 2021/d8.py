@@ -23,7 +23,7 @@ def check(big: list[str], small: list[str]) -> bool:
     return all(x in big for x in small)
 
 
-def decode(digits_in: str) -> dict(str, list):
+def decode(digits_in: str) -> dict(str, list[str]):
     poss = {}
     numbers = digits_in.split()
     for codestring in numbers:
@@ -67,25 +67,6 @@ def get_output_value(decode_key: dict, digits_out: str) -> int:
                 result += str(v)
     return int(result)
 
-# def decode(poss: dict(str, list[str])) -> list[str]:
-#     ans = {}
-#     letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
-#     for k in letters:
-#         ans[k] = []
-
-#     # sort dict by key length
-#     newlist = poss.items()
-#     sortedlist = sorted(newlist, key=lambda s: len(s[0]))
-
-#     # Extract all possible letters per capital letter
-#     for k, v in sortedlist:
-#         for uppercase in k:
-#             if not len(ans[uppercase]):
-#                 for val in v:
-#                     for lowercase in val:
-#                         if lowercase not in ans[uppercase]:
-#                             ans[uppercase].append(lowercase)
-
 
 def solve1(inp: str) -> int:
     result = 0
@@ -105,9 +86,30 @@ def solve2(inp: str) -> int:
         digits_in, digits_out = line.split("|")
         poss = decode(digits_in)
         a = get_output_value(poss, digits_out)
+        print(a)
         result += a
     return result
 
 
 print(f"Answer 1: {solve1(inp)}")
 print(f"Answer 2: {solve2(inp)}")
+
+
+# def decode(poss: dict(str, list[str])) -> list[str]:
+#     ans = {}
+#     letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+#     for k in letters:
+#         ans[k] = []
+
+#     # sort dict by key length
+#     newlist = poss.items()
+#     sortedlist = sorted(newlist, key=lambda s: len(s[0]))
+
+#     # Extract all possible letters per capital letter
+#     for k, v in sortedlist:
+#         for uppercase in k:
+#             if not len(ans[uppercase]):
+#                 for val in v:
+#                     for lowercase in val:
+#                         if lowercase not in ans[uppercase]:
+#                             ans[uppercase].append(lowercase)
