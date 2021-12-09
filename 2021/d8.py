@@ -85,11 +85,6 @@ def get_output_value(decode_key: dict, digits_out: str) -> int:
 #                     for lowercase in val:
 #                         if lowercase not in ans[uppercase]:
 #                             ans[uppercase].append(lowercase)
-#     numbers = ["ABCEFG", "CF", "ACDEG", "ACDFG", "BCDF",
-#                "ABDFG", "ABDEFG", "ACF", "ABCDEFG", "ABCDFG"]
-#     for letter in numbers[8]:
-#         if letter in numbers[0] and letter in numbers[6] and not letter in numbers[9]:
-#             print(letter)
 
 
 def solve1(inp: str) -> int:
