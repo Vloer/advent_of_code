@@ -23,7 +23,7 @@ def check(big: list[str], small: list[str]) -> bool:
     return all(x in big for x in small)
 
 
-def decode(digits_in: str) -> dict(str, list[str]):
+def decode(digits_in: str) -> dict(str, list):
     poss = {}
     numbers = digits_in.split()
     for codestring in numbers:
@@ -105,7 +105,6 @@ def solve2(inp: str) -> int:
         digits_in, digits_out = line.split("|")
         poss = decode(digits_in)
         a = get_output_value(poss, digits_out)
-        print(a)
         result += a
     return result
 
