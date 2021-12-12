@@ -34,41 +34,53 @@ def get_neighbours(mat: list[list[int]], curpos: tuple(int)) -> list[int]:
     return adjacent
 
 
-def continue_upwards(mat: list[list[int]], starting_pos: tuple(int), size=1, positions_already_checked=[]):
+def continue_upwards(mat: list[list[int]], starting_pos: tuple(int), size=1, positions_already_checked=[]) -> int:
     row = starting_pos[0]
     pos = starting_pos[1]
     height = mat[row][pos]
     # go right
     if pos + 1 < len(mat[0]):
-        new_height = mat[row][pos + 1]
-        if new_height > height and new_height < 9 and (row, pos+1) not in positions_already_checked:
+        new_row = row
+        new_pos = pos + 1
+        new_height = mat[new_row][new_pos]
+        if new_height > height and new_height < 9 and (new_row, new_pos) not in positions_already_checked:
             size += 1
-            size = continue_upwards(mat, (row, pos + 1), size, positions_already_checked)
-            positions_already_checked.append((row, pos+1))
+            size = continue_upwards(
+                mat, (new_row, new_pos), size, positions_already_checked)
+            positions_already_checked.append((new_row, new_pos))
 
     # go left
     if pos > 0:
-        new_height = mat[row][pos - 1]
-        if new_height > height and new_height < 9 and (row, pos-1) not in positions_already_checked:
+        new_row = row
+        new_pos = pos - 1
+        new_height = mat[new_row][new_pos]
+        if new_height > height and new_height < 9 and (new_row, new_pos) not in positions_already_checked:
             size += 1
-            size = continue_upwards(mat, (row, pos - 1), size, positions_already_checked)
-            positions_already_checked.append((row, pos-1))
+            size = continue_upwards(
+                mat, (new_row, new_pos), size, positions_already_checked)
+            positions_already_checked.append((new_row, new_pos))
 
     # go down
     if row + 1 < len(mat):
-        new_height = mat[row + 1][pos]
-        if new_height > height and new_height < 9 and (row+1, pos) not in positions_already_checked:
+        new_row = row + 1
+        new_pos = pos
+        new_height = mat[new_row][new_pos]
+        if new_height > height and new_height < 9 and (new_row, new_pos) not in positions_already_checked:
             size += 1
-            size = continue_upwards(mat, (row + 1, pos), size, positions_already_checked)
-            positions_already_checked.append((row+1, pos))
+            size = continue_upwards(
+                mat, (new_row, new_pos), size, positions_already_checked)
+            positions_already_checked.append((new_row, new_pos))
 
     # go up
     if row > 0:
-        new_height = mat[row - 1][pos]
-        if new_height > height and new_height < 9 and (row-1, pos) not in positions_already_checked:
+        new_row = row - 1
+        new_pos = pos
+        new_height = mat[new_row][new_pos]
+        if new_height > height and new_height < 9 and (new_row, new_pos) not in positions_already_checked:
             size += 1
-            size = continue_upwards(mat, (row - 1, pos), size, positions_already_checked)
-            positions_already_checked.append((row-1, pos))
+            size = continue_upwards(
+                mat, (new_row, new_pos), size, positions_already_checked)
+            positions_already_checked.append((new_row, new_pos))
     return size
 
 
