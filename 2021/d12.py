@@ -22,37 +22,89 @@ test1 = ["start-A",
 
 class System:
     def __init__(self) -> None:
+        self.caves: list[str] = []
+        self.paths: list[str] = []
+        self.connections: dict(str) = defaultdict(list)
+
+    def add_cave(self, cave: str) -> None:
+        if cave not in self.caves:
+            self.caves.append(cave)
+    
+    def add_path(self, path: list[str]) -> None:
+        self.paths.append(path)
+
+    def add_connection(self, cave: str, connection: str) -> None:
+        self.connections[cave].append(connection)
+
+
+class Cave:
+    def __init__(self, name: str = None, is_big: bool = False, connections: list[str] = None) -> None:
         self.caves = []
+        self.visisted = False
+        self.is_big = is_big
+        self.connections = connections
 
     def add_cave(self, cave: Cave) -> None:
         self.caves.append(cave)
 
 
-class Cave:
-    def __init__(self, name: str, is_big: bool, connections: list[str]) -> None:
-        self.visisted = False
-    def
-
-
-def create_system(inp: list[str]) -> defaultdict(list[str]):
-    # system = defaultdict(list)
+def create_system(inp: list[str]) -> System:
+    # system_dict = defaultdict(list)
     # for line in inp:
     #     k, v = line.split('-')
-    #     system[k].append(v)
-    #     system[v].append(k)
-    system = System
+    #     system_dict[k].append(v)
+    #     system_dict[v].append(k)
+    system = System()
     for line in inp:
-        k,v = line.split('-')
-        cave = Cave(k, k.isupper(), v)
-        system.add_cave(cave)
+        k, v = line.split('-')
+        system.add_cave(k)
+        system.add_connection(k, v)
+        system.add_connection(v, k)
     return system
+
+
+def find_path(system: defaultdict(list), paths_taken: list[str] = []) -> list[str] | bool:
+    NEW_PATH_FOUND = False
+    current_path = ''
+    current_cave = 'start'
+    caves_visited = []
+    move(system, current_cave, caves_visited)
+
+
+    return paths_taken, NEW_PATH_FOUND
+
+
+def get_options(system: System, current_cave: str, caves_visited: list[str]) -> list[str]:
+    options = []
+    for cave in system.connections[current_cave]:
+        if cave == 'start':
+            continue
+        elif cave.isupper():
+            options.append(cave)
+        elif cave not in caves_visited:
+            options.append(cave)
+    return options
+
+
+def move(system: System, current_cave: str, caves_visited: list[str]) -> list[str] | bool:
+    caves_visited.append(current_cave)
+    if current_cave != 'end':
+        opts = get_options(system, current_cave, caves_visited)
+        if len(opts) > 0:
+            for cave in opts:
+                caves_visited = move(system, cave, caves_visited)
+        else:
+            return caves_visited[:-1]
+    else:
+        system.add_path(caves_visited)
+        return caves_visited[:-1]
 
 
 def solve1(data: list[str]) -> int:
     result = 0
     system = create_system(data)
-    for cave, connections in system.items():
-        cave = Cave(cave.isupper(), connections)
+    find_path(system)
+    print(system.paths)
     return result
 
 
