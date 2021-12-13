@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pathlib import Path
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 input_file = Path(__file__).parent / "inputs" / "d12.txt"
 
@@ -18,18 +18,31 @@ test1 = ["start-A",
          "b-d",
          "A-end",
          "b-end"]
+test2 = ["dc-end",
+         "HN-start",
+         "start-kj",
+         "dc-start",
+         "dc-HN",
+         "LN-dc",
+         "HN-end",
+         "kj-sa",
+         "kj-HN",
+         "kj-dc"]
 
 
 class System:
     def __init__(self) -> None:
         self.caves: list[str] = []
+        self.caves_small: list[str] = []
         self.paths: list[str] = []
         self.connections: dict(str) = defaultdict(list)
 
     def add_cave(self, cave: str) -> None:
         if cave not in self.caves:
             self.caves.append(cave)
-    
+        if cave not in self.caves_small and cave.islower():
+            self.caves_small.append(cave)
+
     def add_path(self, path: list[str]) -> None:
         self.paths.append(path)
 
@@ -37,81 +50,69 @@ class System:
         self.connections[cave].append(connection)
 
 
-class Cave:
-    def __init__(self, name: str = None, is_big: bool = False, connections: list[str] = None) -> None:
-        self.caves = []
-        self.visisted = False
-        self.is_big = is_big
-        self.connections = connections
-
-    def add_cave(self, cave: Cave) -> None:
-        self.caves.append(cave)
-
-
-def create_system(inp: list[str]) -> System:
-    # system_dict = defaultdict(list)
-    # for line in inp:
-    #     k, v = line.split('-')
-    #     system_dict[k].append(v)
-    #     system_dict[v].append(k)
+def create_system(inp: list[str], part2: bool = False) -> System:
     system = System()
     for line in inp:
         k, v = line.split('-')
         system.add_cave(k)
         system.add_connection(k, v)
         system.add_connection(v, k)
+        if part2:
+            if k.islower():
+                system.add_connection(v, k)
+                system.add_connection(k, v)
+            if v.islower():
+                system.add_connection(k, v)
+                system.add_connection(v, k)
+
     return system
 
 
-def find_path(system: defaultdict(list), paths_taken: list[str] = []) -> list[str] | bool:
-    NEW_PATH_FOUND = False
-    current_path = ''
+def find_path(system: System) -> list[str]:
     current_cave = 'start'
     caves_visited = []
     move(system, current_cave, caves_visited)
-
-
-    return paths_taken, NEW_PATH_FOUND
+    return system.paths
 
 
 def get_options(system: System, current_cave: str, caves_visited: list[str]) -> list[str]:
     options = []
+    small_caves_visited = [x for x in caves_visited if x.islower() and not x == 'start']
+    counts = Counter(small_caves_visited)
     for cave in system.connections[current_cave]:
         if cave == 'start':
             continue
         elif cave.isupper():
-            options.append(cave)
-        elif cave not in caves_visited:
-            options.append(cave)
+            if cave not in options:
+                options.append(cave)
+        elif cave not in options:
+            if any([v > 1 for v in counts.values()]):
+                if counts[cave] + 1 < 2:
+                    options.append(cave)
+            else:
+                options.append(cave)
     return options
 
 
 def move(system: System, current_cave: str, caves_visited: list[str]) -> list[str] | bool:
     caves_visited.append(current_cave)
-    if current_cave != 'end':
-        opts = get_options(system, current_cave, caves_visited)
-        if len(opts) > 0:
-            for cave in opts:
-                caves_visited = move(system, cave, caves_visited)
-        else:
-            return caves_visited[:-1]
-    else:
-        system.add_path(caves_visited)
-        return caves_visited[:-1]
+
+    if current_cave == 'end':
+        system.add_path(caves_visited.copy())
+        caves_visited.pop()
+        return
+    opts = get_options(system, current_cave, caves_visited)
+    if len(opts) > 0:
+        for cave in opts:
+            move(system, cave, caves_visited)
+    caves_visited.pop()
 
 
-def solve1(data: list[str]) -> int:
-    result = 0
-    system = create_system(data)
-    find_path(system)
-    print(system.paths)
-    return result
+def solve(data: list[str], part2: bool = False) -> int:
+    system = create_system(data, part2)
+    paths = find_path(system)
+    return len(paths)
 
 
-def solve2(data: list[int]) -> int:
-    result = 0
-    return result
-
-
-print(f"Answer 1: {solve1(test1)}")
-print(f"Answer 2: {solve2(inp)}")
+print(f"Answer 1: {solve(inp)}")
+print(f"Answer 2: {solve(inp, True)}")
