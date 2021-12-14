@@ -7,12 +7,10 @@ input_file = Path(__file__).parent / "inputs" / "d14.txt"
 
 def parse_input(txt_file: str = input_file) -> list[int]:
     with open(txt_file, 'r') as f:
-        # return([x.split("\n") for x in f.read().split("\n\n")])
         return f.read().split("\n\n")
 
 
 def parse_input_final(data: list[str]) -> list[str] | defaultdict(list):
-    # template = [char for char in data[0]]
     template = data[0]
     rules = defaultdict()
     for rule in data[1].split("\n"):
