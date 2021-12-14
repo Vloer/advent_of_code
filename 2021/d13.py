@@ -35,7 +35,7 @@ test1 = [
 ]
 
 
-def make_grid(coords: list[tuple(int)]) -> list[list[int]]:
+def make_grid(coords: list[tuple(int)]) -> np.ndarray:
     max_x = 0
     max_y = 0
     for c in coords:
@@ -48,35 +48,41 @@ def make_grid(coords: list[tuple(int)]) -> list[list[int]]:
     for c in coords:
         x, y = list(map(int, c.split(',')))
         grid[y][x] = 1
-    return grid
+    return np.array(grid)
 
 
 def solve(data: list[list[tuple | str]], result: int = 0, max_folds: int = 0) -> int:
     coords, instructions = data
     grid = make_grid(coords)
     for i, instruction in enumerate(instructions):
+        new_grid = grid.copy()
+        print(type(grid))
+        print(type(new_grid))
         if i >= max_folds:
             break
         ax, line = instruction.split("fold along ")[1].split("=")
+        # if ax == 'x':
+        #     g1 = grid[:, :int(line)]
+        #     g2 = grid[:, int(line)+1:]
+        #     g2 = np.flip(g2, axis=1)
+        # else:
+        #     g1 = grid[:int(line), :]
+        #     g2 = grid[int(line)+1:, :]
+        #     g2 = np.flip(g2, axis=0)
         if ax == 'x':
-            grid = grid.T
-            g1 = grid[:int(line)+1]
-            g2 = grid[int(line):]
-            g2 = np.flip(g2, axis=1)
-            grid = g1 + g2
-            grid = grid.T
+            new_grid[:, :line] += np.fliplr(grid[:, line + 1:])
+            new_grid = new_grid[:, :line]
         else:
-            g1 = grid[:int(line)+1]
-            g2 = grid[int(line):]
-            g2 = np.flip(g2, axis=0)
-            grid = g1 + g2
+            new_grid[:line, :] += np.flipud(grid[line + 1:, :])
+            new_grid = new_grid[:line, :]
+        grid = new_grid
     grid[grid > 0] = 1
     return np.sum(grid)
 
 
 def test_func():
     count = -1
-    grid = np.array([[1, 2, 3, 4, 5], [0, 1, 0, 0, 1], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], 
+    grid = np.array([[1, 2, 3, 4, 5], [0, 1, 0, 0, 1], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0],
                      [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [100, 100, 100, 100, 100], [10, 10, 10, 10, 10]])
     line = 4
     for i in range(line, len(grid)-1):

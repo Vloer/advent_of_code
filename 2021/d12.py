@@ -50,9 +50,9 @@ class System:
         self.connections[cave].append(connection)
 
 
-def create_system(inp: list[str], part2: bool = False) -> System:
+def create_system(data: list[str], part2: bool = False) -> System:
     system = System()
-    for line in inp:
+    for line in data:
         k, v = line.split('-')
         system.add_cave(k)
         system.add_connection(k, v)
