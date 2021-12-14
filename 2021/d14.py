@@ -1,8 +1,6 @@
 from __future__ import annotations
 from pathlib import Path
 from collections import defaultdict, Counter
-import functools
-from frozendict import frozendict
 
 input_file = Path(__file__).parent / "inputs" / "d14.txt"
 
@@ -25,9 +23,9 @@ def parse_input_final(data: list[str]) -> list[str] | defaultdict(list):
 
 inp = parse_input()
 test1 = [
-'NNCB',
+    'NNCB',
 
-'''CH -> B
+    '''CH -> B
 HH -> N
 CB -> H
 NH -> C
@@ -45,41 +43,32 @@ CC -> N
 CN -> C'''
 ]
 
-def freezeargs(func):
-    """Transform mutable dictionnary
-    Into immutable
-    Useful to be compatible with cache
-    """
-    @functools.wraps(func)
-    def wrapped(*args, **kwargs):
-        args = tuple([frozendict(arg) if isinstance(arg, dict) else arg for arg in args])
-        kwargs = {k: frozendict(v) if isinstance(v, dict) else v for k, v in kwargs.items()}
-        return func(*args, **kwargs)
-    return wrapped
 
-@freezeargs
-@functools.lru_cache(maxsize=1)
-def get_new_template(template: str, rules: defaultdict(str), steps: int) -> str:
+def get_new_template_count(template: str, rules: defaultdict(str), steps: int) -> Counter:
+
+    starting_pairs = [template[i-1:i+1] for i in range(1, len(template))]
+    count = Counter()
+    letter_count = Counter(template)
+    [count.update({pair: 1}) for pair in starting_pairs]
     for _ in range(steps):
-        template_pairs = []
-        [template_pairs.append(template[i-1:i+1]) for i in range(1,len(template))]
-        for i, pair in enumerate(template_pairs):
-            template_pairs[i] = f"{pair[0]}{rules[pair]}"
-        template_pairs.append(template[-1])
-        template = ''.join(template_pairs)
-        print(f"Completed step {_+1}, length is {len(template)}")
-    return template
+        update = Counter()
+        for k, v in rules.items():
+            if count[k] > 0:
+                key1 = k[0] + v
+                key2 = v + k[1]
+                update.update({key1: count[k], key2: count[k]})
+                letter_count.update({v: count[k]})
+        count = update.copy()
+
+    return letter_count
 
 
 def solve(data: list[str], steps: int, result: int = 0) -> int:
-    template, rules= parse_input_final(data)
-    template = get_new_template(template, rules, steps)
-    c = Counter(template)
+    template, rules = parse_input_final(data)
+    c = get_new_template_count(template, rules, steps)
     result = c.most_common(1)[0][1] - c.most_common()[-1][1]
     return result
 
 
-
-# print(f"Answer 1: {solve(inp, 10)}")
+print(f"Answer 1: {solve(inp, 10)}")
 print(f"Answer 2: {solve(inp, 40)}")
-
