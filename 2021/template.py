@@ -12,13 +12,11 @@ def parse_input(txt_file: str = input_file) -> list[int]:
 inp = parse_input()
 
 
-def solve1() -> None:
-    result = 0
+def solve1(data: list[int], result: int = 0) -> int:
     return result
 
 
-def solve2() -> None:
-    result = 0
+def solve2(data: list[int], result: int = 0) -> int:
     return result
 
 
