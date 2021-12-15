@@ -44,7 +44,7 @@ def make_grid(coords: list[tuple(int)]) -> np.ndarray:
             max_x = x
         if y > max_y:
             max_y = y
-    grid = np.zeros((max_y+1, max_x + 1), dtype=int)
+    grid = np.zeros((max_y + 1, max_x + 1), dtype=int)
     for c in coords:
         x, y = list(map(int, c.split(',')))
         grid[y][x] = 1
@@ -56,18 +56,17 @@ def solve(data: list[list[tuple | str]], result: int = 0, max_folds: int = 0) ->
     grid = make_grid(coords)
     for i, instruction in enumerate(instructions):
         new_grid = grid.copy()
-        print(type(grid))
-        print(type(new_grid))
         if i >= max_folds:
             break
         ax, line = instruction.split("fold along ")[1].split("=")
+        line = int(line)
         # if ax == 'x':
-        #     g1 = grid[:, :int(line)]
-        #     g2 = grid[:, int(line)+1:]
+        #     g1 = grid[:, :line]
+        #     g2 = grid[:, line+1:]
         #     g2 = np.flip(g2, axis=1)
         # else:
-        #     g1 = grid[:int(line), :]
-        #     g2 = grid[int(line)+1:, :]
+        #     g1 = grid[:line, :]
+        #     g2 = grid[line+1:, :]
         #     g2 = np.flip(g2, axis=0)
         if ax == 'x':
             new_grid[:, :line] += np.fliplr(grid[:, line + 1:])
