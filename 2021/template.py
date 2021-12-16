@@ -18,6 +18,6 @@ def solve(data: list[int], result: int = 0) -> int:
 
 
 start = perf_counter()
-print(f"Answer 1 took {time.perf_counter()-start}: {solve(inp)}")
+print(f"Answer 1 took {perf_counter()-start}: {solve(inp)}")
 start = perf_counter()
-print(f"Answer 2 took {time.perf_counter()-start}: {solve(inp)}")
+print(f"Answer 2 took {perf_counter()-start}: {solve(inp)}")
