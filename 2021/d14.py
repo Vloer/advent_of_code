@@ -1,6 +1,7 @@
 from __future__ import annotations
 from pathlib import Path
 from collections import defaultdict, Counter
+import time
 
 input_file = Path(__file__).parent / "inputs" / "d14.txt"
 
@@ -43,7 +44,6 @@ CN -> C'''
 
 
 def get_new_template_count(template: str, rules: defaultdict(str), steps: int) -> Counter:
-
     starting_pairs = [template[i-1:i+1] for i in range(1, len(template))]
     count = Counter()
     letter_count = Counter(template)
@@ -68,5 +68,7 @@ def solve(data: list[str], steps: int, result: int = 0) -> int:
     return result
 
 
-print(f"Answer 1: {solve(inp, 10)}")
-print(f"Answer 2: {solve(inp, 40)}")
+start = time.perf_counter()
+print(f"Answer 1 took {time.perf_counter()-start}: {solve(inp, 10)}")
+start = time.perf_counter()
+print(f"Answer 2 took {time.perf_counter()-start}: {solve(inp, 40)}")
