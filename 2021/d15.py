@@ -1,9 +1,7 @@
 from __future__ import annotations
-from collections import deque
 from pathlib import Path
 import numpy as np
-import collections
-from sys import maxsize
+from time import perf_counter
 
 input_file = Path(__file__).parent / "inputs" / "d15.txt"
 
@@ -14,7 +12,7 @@ def parse_input(txt_file: str = input_file) -> list[int]:
 
 
 inp = np.array(parse_input())
-test = np.array([
+test = [
     [1, 1, 6, 3, 7, 5, 1, 7, 4, 2],
     [1, 3, 8, 1, 3, 7, 3, 6, 7, 2],
     [2, 1, 3, 6, 5, 1, 1, 3, 2, 8],
@@ -25,7 +23,12 @@ test = np.array([
     [3, 1, 2, 5, 4, 2, 1, 6, 3, 9],
     [1, 2, 9, 3, 1, 3, 8, 5, 2, 1],
     [2, 3, 1, 1, 9, 4, 4, 5, 8, 1]
-])
+]
+test2 = [
+    [1, 1, 1],
+    [1, 1, 1],
+    [2, 2, 2]
+]
 
 
 def get_adj_indices(mat: np.ndarray, node: tuple(int)) -> list(tuple(int)):
@@ -78,8 +81,6 @@ def astar_search(mat: np.ndarray, start: tuple(int), end: tuple(int)) -> list(tu
     while len(open) > 0:
         open.sort()
         current_node: Node = open.pop(0)
-        if current_node.position == (8,8):
-            print('k')
         closed.append(current_node)
         if current_node == end_node:
             total_cost = current_node.dist_tot
@@ -97,7 +98,6 @@ def astar_search(mat: np.ndarray, start: tuple(int), end: tuple(int)) -> list(tu
             if adj in closed:
                 continue
 
-            # Generate heuristic
             adj.dist_start = current_node.dist_tot
             adj.dist_goal = value
             adj.dist_tot = adj.dist_start + adj.dist_goal
@@ -117,16 +117,38 @@ def add_to_open(open: list[Node], neighbor: Node):
     return True
 
 
-def solve1(data: np.ndarray, result: int = 0) -> int:
+def wrap(x: int) -> int:
+    return ((x-1) % 9) + 1
+
+
+def solve(data: np.ndarray, part1=True, result: int = 0) -> int:
+    if part1:
+        data = np.array(data)
+    else:
+        big_grid = np.array([row * 5 for row in data] * 5)
+        i = [*range(len(data), len(data)*2)]
+        for l in i:
+            count = 0
+            count_col = 0
+            for row in range(l, len(big_grid), len(data)):
+                count += 1
+                big_grid[row] += count
+            for col in range(l, len(big_grid[0]), len(data)):
+                count_col += 1
+                big_grid[:, col] += count_col
+
+        wrap_func = np.vectorize(wrap)
+        data = wrap_func(big_grid)
+
     start = (0, 0)
     end = (data.shape[0] - 1, data.shape[1] - 1)
     path, cost = astar_search(data, start, end)
     return cost
 
 
-def solve2(data: list[int], result: int = 0) -> int:
-    return result
-
-
-print(f"Answer 1: {solve1(test)}")
-print(f"Answer 2: {solve2(test)}")
+timing_1 = perf_counter()
+answer_1 = solve(test)
+print(f"Answer 1 took {perf_counter()-timing_1}: {answer_1}")
+timing_2 = perf_counter()
+answer_2 = solve(test, part1=False)
+print(f"Answer 2 took {perf_counter()-timing_2}: {answer_2}")

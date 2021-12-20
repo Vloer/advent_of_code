@@ -13,11 +13,13 @@ def parse_input(txt_file: str = input_file) -> list[int]:
 inp = parse_input()
 
 
-def solve(data: list[int], result: int = 0) -> int:
+def solve(data: list[int], result: int = 0, part1=True) -> int:
     return result
 
 
-start = perf_counter()
-print(f"Answer 1 took {perf_counter()-start}: {solve(inp)}")
-start = perf_counter()
-print(f"Answer 2 took {perf_counter()-start}: {solve(inp)}")
+timing_1 = perf_counter()
+answer_1 = solve(inp)
+print(f"Answer 1 took {perf_counter()-timing_1}: {answer_1}")
+timing_2 = perf_counter()
+answer_2 = solve(inp, False)
+print(f"Answer 2 took {perf_counter()-timing_2}: {answer_2}")
