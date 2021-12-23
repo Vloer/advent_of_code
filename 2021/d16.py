@@ -53,20 +53,18 @@ def calculate_expression(p: Packet) -> int:
         return np.max(values)
     elif expr == 4:
         return p.literal_value
-    else:
+    elif expr == 5:
         if values[0] > values[1]:
-            if expr == 5:
-                return 1
-            return 0
-        elif values[0] < values[1]:
-            if expr == 6:
-                return 1
-            return 0
-        else:
             return 1
-
-    print('done')
-    return
+        return 0
+    elif expr == 6:
+        if values[0] < values[1]:
+            return 1
+        return 0
+    elif expr == 7:
+        if values[0] == values[1]:
+            return 1
+        return 0
 
 
 class Packet:
@@ -168,8 +166,8 @@ def solve(data: str, result: int = 0, part1=True) -> int:
 
 
 timing_1 = perf_counter()
-answer_1 = solve(inp, part1=True)
-print(f"Answer 1 took {perf_counter()-timing_1}: {answer_1}")
+# answer_1 = solve(inp, part1=True)
+# print(f"Answer 1 took {perf_counter()-timing_1}: {answer_1}")
 timing_2 = perf_counter()
 answer_2 = solve(inp, part1=False)
 print(f"Answer 2 took {perf_counter()-timing_2}: {answer_2}")
