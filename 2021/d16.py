@@ -14,7 +14,8 @@ def parse_input(txt_file: str = input_file) -> list[int]:
 inp = parse_input()
 test = ['D2FE28', '38006F45291200', 'EE00D40C823060', '8A004A801A8002F478',
         '620080001611562C8802118E34', 'C0015000016115A2E0802F182340', 'A0016C880162017C3686B18A3D4780']
-test2 = ['C200B40A82', '04005AC33890', '880086C3E88112', 'CE00C43D881120', 'D8005AC2A8F0', 'F600BC2D8F', '9C005AC2F8F0', '9C0141080250320F1802104A08']
+test2 = ['C200B40A82', '04005AC33890', '880086C3E88112', 'CE00C43D881120',
+         'D8005AC2A8F0', 'F600BC2D8F', '9C005AC2F8F0', '9C0141080250320F1802104A08']
 
 
 def hex_to_bin(s: str) -> bin:
@@ -35,7 +36,7 @@ def get_total_versions(p: Packet) -> int:
     child_sum = 0
     for child in p.children:
         child_sum += get_total_versions(child)
-    return p.version + child_sum 
+    return p.version + child_sum
 
 
 def calculate_expression(p: Packet) -> int:
@@ -46,7 +47,10 @@ def calculate_expression(p: Packet) -> int:
     if expr == 0:
         return np.sum(values)
     elif expr == 1:
-        return np.prod(values)
+        t = 1
+        for q in p.children:
+            t *= calculate_expression(q)
+        return t
     elif expr == 2:
         return np.min(values)
     elif expr == 3:
@@ -54,17 +58,11 @@ def calculate_expression(p: Packet) -> int:
     elif expr == 4:
         return p.literal_value
     elif expr == 5:
-        if values[0] > values[1]:
-            return 1
-        return 0
+        return values[0] > values[1]
     elif expr == 6:
-        if values[0] < values[1]:
-            return 1
-        return 0
+        return values[0] < values[1]
     elif expr == 7:
-        if values[0] == values[1]:
-            return 1
-        return 0
+        return values[0] == values[1]
 
 
 class Packet:
@@ -86,14 +84,17 @@ class Packet:
         if self.type_id == 4:
             self.get_literal()
             if PRINT_SETTING:
-                print(f'Packet {GLOBAL_PACKET_COUNT}\n\tversion: {self.version}\n\tliteral: {self.literal_value}')
+                print(
+                    f'Packet {GLOBAL_PACKET_COUNT}\n\tversion: {self.version}\n\tliteral: {self.literal_value}')
         else:
             self.get_operator()
             if PRINT_SETTING:
                 if self.operator == 0:
-                    print(f'Packet {GLOBAL_PACKET_COUNT}\n\tversion: {self.version}\n\toperator: {self.operator}\n\tlength: {self.total_length}')
+                    print(
+                        f'Packet {GLOBAL_PACKET_COUNT}\n\tversion: {self.version}\n\toperator: {self.operator}\n\tlength: {self.total_length}')
                 else:
-                    print(f'Packet {GLOBAL_PACKET_COUNT}\n\tversion: {self.version}\n\toperator: {self.operator}\n\tsubpackets: {self.num_subpackets}')
+                    print(
+                        f'Packet {GLOBAL_PACKET_COUNT}\n\tversion: {self.version}\n\toperator: {self.operator}\n\tsubpackets: {self.num_subpackets}')
             self.analyze_subpackets()
 
     def get_version_typeid(self):
@@ -107,13 +108,14 @@ class Packet:
         while True:
             self.binary, s = cut(self.binary, 0, 5)
             new_str += s[1:]
-            if s.startswith('0') or len(self.binary) < 6:
+            if s.startswith('0'):
                 self.literal_value = _int(new_str)
                 break
 
     def get_operator(self):
         self.binary, lti = cut(self.binary, 0, 1)
-        self.operator = int(lti)
+        self.operator = _int(lti)
+
         if self.operator == 0:
             self.binary, tl = cut(self.binary, 0, 15)
             self.total_length = _int(tl)
@@ -123,7 +125,8 @@ class Packet:
 
     def analyze_subpackets(self):
         if self.operator == 0:
-            self.binary_remaining, self.binary = cut(self.binary, 0, self.total_length)
+            self.binary_remaining, self.binary = cut(
+                self.binary, 0, self.total_length)
             while len(self.binary) > 6:
                 subpacket = Packet(self.binary, parent=self)
                 self.children.append(subpacket)
@@ -143,31 +146,18 @@ def solve(data: str, result: int = 0, part1=True) -> int:
     global PRINT_SETTING
     GLOBAL_PACKET_COUNT = 0
     PRINT_SETTING = False
+    binary = hex_to_bin(data)
+    outer_packet = Packet(binary)
     if part1:
-        if isinstance(data, list):
-            for code in data:
-                GLOBAL_PACKET_COUNT = 0
-                print(f'\nStarting input \'{code}\'')
-                binary = hex_to_bin(code)
-                outer_packet = Packet(binary)
-                result = get_total_versions(outer_packet)
-                print(result)
-        else:
-            print(f'\nStarting input \'{data}\'')
-            binary = hex_to_bin(data)
-            outer_packet = Packet(binary)
-            result = get_total_versions(outer_packet)
+        result = get_total_versions(outer_packet)
     else:
-        print(f'\nStarting input \'{data}\'')   
-        binary = hex_to_bin(data)
-        outer_packet = Packet(binary)
         result = calculate_expression(outer_packet)
     return result
 
 
 timing_1 = perf_counter()
-# answer_1 = solve(inp, part1=True)
-# print(f"Answer 1 took {perf_counter()-timing_1}: {answer_1}")
+answer_1 = solve(inp, part1=True)
+print(f"Answer 1 took {perf_counter()-timing_1}: {answer_1}")
 timing_2 = perf_counter()
 answer_2 = solve(inp, part1=False)
 print(f"Answer 2 took {perf_counter()-timing_2}: {answer_2}")
