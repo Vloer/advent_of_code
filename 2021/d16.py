@@ -8,22 +8,7 @@ input_file = Path(__file__).parent / "inputs" / "d16.txt"
 def parse_input(txt_file: str = input_file) -> list[int]:
     with open(txt_file, 'r') as f:
         return(f.read())
-
-
-'''
-first 3 bits = packet version
-next 3 bits = type ID
-groups of 5 bits with leading 1 every time (so 1 + 4 bits)
-last group starts with 0 and then 4 bits
-trailing zeroes
-
-Type IDs:
-    4: literal value
-    anything else: 
-        The next bit is the length type ID
-        0: next 15 bits = total bit length of sub packets in this packet
-        1: next 11 bits = number of sub packets in this packet
-'''
+        
 
 inp = parse_input()
 test = ['D2FE28', '38006F45291200', 'EE00D40C823060', '8A004A801A8002F478',
@@ -45,14 +30,21 @@ def _int(b: str) -> int:
     return int(b, 2)
 
 
+def get_total_versions(p: Packet) -> int:
+    child_sum = 0
+    for child in p.children:
+        child_sum += get_total_versions(child)
+    return p.version + child_sum 
+
+
+
 class Packet:
     def __init__(self, binary: str, parent: Packet = None, printing=False):
-        global GLOBAL_VERSION_COUNT
         global GLOBAL_PACKET_COUNT
         global PRINT_SETTING
         GLOBAL_PACKET_COUNT += 1
-        self.parent = parent
-        self.binary_start: str = binary
+        self.parent: Packet = parent
+        self.children: list[Packet] = []
         self.binary: str = binary
         self.binary_remaining: str = ''
         self.version: int = None
@@ -74,7 +66,6 @@ class Packet:
                 else:
                     print(f'Packet {GLOBAL_PACKET_COUNT}\n\tversion: {self.version}\n\toperator: {self.operator}\n\tsubpackets: {self.num_subpackets}')
             self.analyze_subpackets()
-        GLOBAL_VERSION_COUNT += self.version
 
     def get_version_typeid(self):
         self.binary, v = cut(self.binary, 0, 3)
@@ -106,6 +97,7 @@ class Packet:
             self.binary_remaining, self.binary = cut(self.binary, 0, self.total_length)
             while len(self.binary) > 6:
                 subpacket = Packet(self.binary, parent=self)
+                self.children.append(subpacket)
                 self.binary = subpacket.binary
             self.binary = self.binary_remaining
         elif self.operator == 1:
@@ -113,35 +105,34 @@ class Packet:
             for _ in range(self.num_subpackets):
                 current_subpacket += 1
                 subpacket = Packet(self.binary, parent=self)
+                self.children.append(subpacket)
                 self.binary = subpacket.binary
 
 
 def solve(data: str, result: int = 0, part1=True) -> int:
-    global GLOBAL_VERSION_COUNT
     global GLOBAL_PACKET_COUNT
     global PRINT_SETTING
-    GLOBAL_VERSION_COUNT = 0
     GLOBAL_PACKET_COUNT = 0
-    PRINT_SETTING = True
+    PRINT_SETTING = False
     if part1:
         if isinstance(data, list):
             for code in data:
-                GLOBAL_VERSION_COUNT = 0
                 GLOBAL_PACKET_COUNT = 0
                 print(f'\nStarting input \'{code}\'')
                 binary = hex_to_bin(code)
-                Packet(binary)
-                print(f'Total versions: {GLOBAL_VERSION_COUNT}')
+                outer_packet = Packet(binary)
+                result = get_total_versions(outer_packet)
+                print(result)
         else:
             print(f'\nStarting input \'{data}\'')
             binary = hex_to_bin(data)
-            Packet(binary)
-            print(f'Total versions: {GLOBAL_VERSION_COUNT}')
+            outer_packet = Packet(binary)
+            result = get_total_versions(outer_packet)
     return result
 
 
 timing_1 = perf_counter()
-answer_1 = solve(inp, part1=True)
+answer_1 = solve(test, part1=True)
 print(f"Answer 1 took {perf_counter()-timing_1}: {answer_1}")
 timing_2 = perf_counter()
 answer_2 = solve(test, part1=False)
