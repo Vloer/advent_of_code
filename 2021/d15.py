@@ -2,6 +2,8 @@ from __future__ import annotations
 from pathlib import Path
 import numpy as np
 from time import perf_counter
+import cProfile
+from sys import maxsize
 
 input_file = Path(__file__).parent / "inputs" / "d15.txt"
 
@@ -53,68 +55,48 @@ def create_adj_list(mat: np.ndarray) -> dict(str):
     return adj_list
 
 
-class Node:
-    def __init__(self, position: tuple(), parent: tuple()):
-        self.position = position
-        self.parent = parent
-        self.dist_start = 0
-        self.dist_goal = 0
-        self.dist_tot = 0
-
-    def __eq__(self, other: Node):
-        return self.position == other.position
-
-    def __lt__(self, other: Node):
-        return self.dist_tot < other.dist_tot
-
-    def __repr__(self):
-        return (f'({self.position}, {self.dist_tot})')
-
-
 def astar_search(mat: np.ndarray, start: tuple(int), end: tuple(int)) -> list(tuple) | int:
+    start_node = start
+    end_node = end
+    parents = {}
+    # open = set()
+    # closed = set()
+    # open.add(start_node)
     open = []
     closed = []
-    start_node = Node(start, None)
-    end_node = Node(end, None)
     open.append(start_node)
+    value_mat = np.zeros_like(mat) + maxsize
+    value_mat[start_node] = 0
 
     while len(open) > 0:
-        open.sort()
-        current_node: Node = open.pop(0)
+        # current_node = open.pop()
+        # closed.add(current_node)
+        current_node = open.pop(0)
         closed.append(current_node)
+        value_cur = value_mat[current_node]
+        print(value_cur)
         if current_node == end_node:
-            total_cost = current_node.dist_tot
+            total_cost = value_mat[current_node]
             path = []
             while current_node != start_node:
-                path.append(current_node.position)
-                current_node = current_node.parent
+                path.append(current_node)
+                current_node = parents[current_node]
             return path[::-1], total_cost
 
-        adjacent = get_adj_indices(mat, current_node.position)
+        adjacent = get_adj_indices(mat, current_node)
 
-        for next in adjacent:
-            value = mat[next]
-            adj = Node(next, current_node)
-            if adj in closed:
+        for next_node in adjacent:
+            if next_node in closed:
                 continue
+            value_next = mat[next_node]
+            value_new = value_cur + value_next
+            if value_new < value_mat[next_node]:
+                value_mat[next_node] = value_cur + value_next
+                parents[next_node] = current_node
+                open.append(next_node)
 
-            adj.dist_start = current_node.dist_tot
-            adj.dist_goal = value
-            adj.dist_tot = adj.dist_start + adj.dist_goal
-
-            # Check if neighbor is in open list and if it has a lower total value
-            if add_to_open(open, adj):
-                open.append(adj)
-
-    # Return None, no path is found
+    print("No path found!")
     return None, None
-
-
-def add_to_open(open: list[Node], neighbor: Node):
-    for node in open:
-        if (neighbor == node and neighbor.dist_tot >= node.dist_tot):
-            return False
-    return True
 
 
 def wrap(x: int) -> int:
@@ -147,8 +129,9 @@ def solve(data: np.ndarray, part1=True, result: int = 0) -> int:
 
 
 timing_1 = perf_counter()
-answer_1 = solve(test)
+# cProfile.run('solve(inp)')
+answer_1 = solve(inp)
 print(f"Answer 1 took {perf_counter()-timing_1}: {answer_1}")
 timing_2 = perf_counter()
-answer_2 = solve(test, part1=False)
-print(f"Answer 2 took {perf_counter()-timing_2}: {answer_2}")
+# answer_2 = solve(inp, part1=False)
+# print(f"Answer 2 took {perf_counter()-timing_2}: {answer_2}")
