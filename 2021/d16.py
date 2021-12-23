@@ -1,6 +1,7 @@
 from __future__ import annotations
 from pathlib import Path
 from time import perf_counter
+import numpy as np
 
 input_file = Path(__file__).parent / "inputs" / "d16.txt"
 
@@ -8,7 +9,7 @@ input_file = Path(__file__).parent / "inputs" / "d16.txt"
 def parse_input(txt_file: str = input_file) -> list[int]:
     with open(txt_file, 'r') as f:
         return(f.read())
-        
+
 
 inp = parse_input()
 test = ['D2FE28', '38006F45291200', 'EE00D40C823060', '8A004A801A8002F478',
@@ -37,9 +38,39 @@ def get_total_versions(p: Packet) -> int:
     return p.version + child_sum 
 
 
+def calculate_expression(p: Packet) -> int:
+    expr = p.type_id
+    values = []
+    for child in p.children:
+        values.append(calculate_expression(child))
+    if expr == 0:
+        return np.sum(values)
+    elif expr == 1:
+        return np.prod(values)
+    elif expr == 2:
+        return np.min(values)
+    elif expr == 3:
+        return np.max(values)
+    elif expr == 4:
+        return p.literal_value
+    else:
+        if values[0] > values[1]:
+            if expr == 5:
+                return 1
+            return 0
+        elif values[0] < values[1]:
+            if expr == 6:
+                return 1
+            return 0
+        else:
+            return 1
+
+    print('done')
+    return
+
 
 class Packet:
-    def __init__(self, binary: str, parent: Packet = None, printing=False):
+    def __init__(self, binary: str, parent: Packet = None):
         global GLOBAL_PACKET_COUNT
         global PRINT_SETTING
         GLOBAL_PACKET_COUNT += 1
@@ -128,12 +159,17 @@ def solve(data: str, result: int = 0, part1=True) -> int:
             binary = hex_to_bin(data)
             outer_packet = Packet(binary)
             result = get_total_versions(outer_packet)
+    else:
+        print(f'\nStarting input \'{data}\'')   
+        binary = hex_to_bin(data)
+        outer_packet = Packet(binary)
+        result = calculate_expression(outer_packet)
     return result
 
 
 timing_1 = perf_counter()
-answer_1 = solve(test, part1=True)
+answer_1 = solve(inp, part1=True)
 print(f"Answer 1 took {perf_counter()-timing_1}: {answer_1}")
 timing_2 = perf_counter()
-answer_2 = solve(test, part1=False)
+answer_2 = solve(inp, part1=False)
 print(f"Answer 2 took {perf_counter()-timing_2}: {answer_2}")
