@@ -22,6 +22,7 @@ def get_target_area(s: str) -> list[tuple(int)]:
     y1, y2 = list(map(int, c[3].split(',')[0].split('y=')[1].split('..')))
     return [range(x1, x2+1), range(-y2, -y1+1)]
 
+
 def create_grid(target_area: list(range)) -> np.array | int:
     size_grid = 5000
     offset = int(size_grid / 2)
@@ -44,72 +45,61 @@ def move(x, y, vx, vy) -> tuple(int) | tuple(int):
 
 
 def check(grid: np.array, steps: int) -> bool | int:
-    if np.any(grid>1):
+    if np.any(grid > 1):
         return steps
     return False
 
 
 def calculate_range_vx(target_area: list(range)) -> range:
     xmin_target = target_area[0][0]
-    xmax_target = target_area[0][-1]
-    xmin = round(sqrt(xmin_target*2))
-    xmax = round(sqrt(xmax_target*2)) + 2
-    return range(xmin, xmax)
+    x = 0
+    vx = 0
+    while x < xmin_target:
+        vx += 1
+        x += vx
+    return range(vx, target_area[0][-1] + 1)
 
 
 def calculate_steps(range_vx: range, init_vy: int, init_grid: np.array, offset: int, area: list(range)) -> tuple(int) | int:
-    total_steps = 10000
     final_vx = final_vy = 0
     max_y_final = -10
     correct_input_count = 0
-    correct_inputs = []
     for vx in range_vx:
         init_vx = vx
         vy = -init_vy
-        grid = init_grid.copy()
         x = 0
         y = offset
         max_y = 0
-        steps = 0
         while True:
-            grid[y, x] += 1
             if -y+offset > max_y:
                 max_y = -y+offset
             ypos = y-offset
             if (x in area[0]) and (ypos in area[1]):
-                correct_inputs.append((init_vx, init_vy))
-                if steps < total_steps:
-                    total_steps = steps
                 if max_y > max_y_final:
                     max_y_final = max_y
                     final_vx = init_vx
                     final_vy = init_vy
-                # print(f'Total steps for input {init_vx, init_vy}: {steps}. Final pos: {x, -(y-offset)}. Max y: {max_y}')
                 correct_input_count += 1
                 break
             if x > max(area[0]) or y > (max(area[1]) + offset):
-                # print(f'Missed target area for input {init_vx, init_vy}. Final pos: {x, -(y-offset)}. Max y: {max_y}')
                 break
             x, y, vx, vy = move(x, y, vx, vy)
-            steps += 1
-    return final_vx, final_vy, total_steps, max_y_final, correct_input_count, correct_inputs
+    return max_y_final, correct_input_count
+
 
 def solve(data: str, result: int = 0, part1=True) -> int:
     area = get_target_area(data)
     grid, offset = create_grid(area)
     max_y = 0
     final_input_count = 0
-    final_inputs = []
-    for vy in range(-10, 100):
-        vx = calculate_range_vx(area)
-        # vx = range(0, 35)
-        final_vx, final_vy, total_steps, final_y, correct_input_count, correct_inputs = calculate_steps(vx, vy, grid, offset, area)
+    vx = calculate_range_vx(area)
+    for vy in range(-10000, 10000):
+        final_y, correct_input_count = calculate_steps(
+            vx, vy, grid, offset, area)
         final_input_count += correct_input_count
         if final_y > max_y:
             max_y = final_y
-        final_inputs.append(correct_inputs)
         print(f'{vy} done')
-    print(final_inputs)
     return max_y, final_input_count
 
 
