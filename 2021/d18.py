@@ -21,12 +21,18 @@ test = [
     '[[[9,[3,8]],[[0,9],6]],[[[3,7],[4,9]],3]]',
     '[[[[1,3],[5,3]],[[1,3],[8,7]]],[[[4,9],[6,9]],[[8,2],[7,3]]]]'
 ]
-t1 = '[[[[[9,8],1],2],3],4]'
-t2 = '[7,[6,[5,[4,[3,2]]]]]'
-t3 = '[[6,[5,[4,[3,2]]]],1]'
-t4 = '[[[[0,7],4],[15,[0,13]]],[1,1]]'
-t5 = '[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]'
-t6 = '[[[[0,7],4],[[7,8],0],[6,7]]]],[1,1]]'
+t1 = [
+'[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]',
+'[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]',
+'[[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]',
+'[[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]]',
+'[7,[5,[[3,8],[1,4]]]]',
+'[[2,[2,2]],[8,[8,1]]]',
+'[2,9]',
+'[1,[[[9,3],9],[[9,0],[0,7]]]]',
+'[[[5,[7,4]],7],1]', 
+'[[[[4,2],2],6],[8,7]]'
+]
 
 
 def depth(s: str) -> int | int:
@@ -86,45 +92,61 @@ def split(s: str) -> str:
             if any([x > 10 for x in list_of_numbers]):
                 s = split(s)
             break
-    print(s)
     return s
 
 
-def find_deepest(s: str):
-    pat = re.compile(r'\[\d,\d\]')
-    return pat.search(s)[0]
-
-
 def explode(s: str):
-    l = [x for x in s]
+    l = []
+    continue_next = False
+    for i, c in enumerate(s[1:]):
+        if continue_next:
+            continue_next = False
+            continue
+        if s[i] in ['[',']',',']:
+            l.append(s[i])
+        else:
+            if c in ['[',']',',']:
+                l.append(s[i])
+            else:
+                l.append(s[i]+c)
+                continue_next = True
+    
+
     loc = depth(s)[1]
-    left_num = int(s[loc + 1])
-    right_num = int(s[loc + 3])
+    if not loc:
+        return s
+    loc_1 = loc_2 = loc
+    left_num = int(l[loc + 1])
+    right_num = int(l[loc + 3])
 
     # Get first number to the left
     i = 1
     while i < loc:
         c = l[loc-i]
         if c not in ['[', ']', ',']:  # is number
-            l[loc-i] = str(int(c) + left_num)
+            res = int(c) + left_num
+            l[loc-i] = str(res)
+            if res > 10:
+                loc_1 += 1
             break
         i += 1
-
     # Change first number to the left
     j = 5
     while loc + j < len(s):
         c = l[loc+j]
         if c not in ['[', ']', ',']:
-            l[loc+j] = str(int(c) + right_num)
+            res = int(c) + right_num
+            l[loc+j] = str(res)
+            if res > 10:
+                loc_2 += 1
             break
         j += 1
     l = ''.join(l)
 
     # Replace deepest nest with 0
-    s = l[:loc] + '0' + l[loc+5:]
+    s = l[:loc_1] + '0' + l[loc_2+5:]
     if depth(s)[0] > 4:
         s = explode(s)
-    print(s)
     return s
 
 
@@ -134,14 +156,15 @@ def reduce(s: str) -> str:
     d = depth(s)[0]
     if d > 4:
         s = reduce(s)
-
     return s
 
 
 def solve(data: list[str], result: int = 0, part1=True) -> int:
-    prev = data[0]
+    num = data[0]
     for row in data[1:]:
-        num = [eval(prev), eval(row)]
+        num_to_analyze = f'[{num},{row}]'
+        num = reduce(num_to_analyze)
+        print(num)
 
     return result
 
@@ -155,9 +178,7 @@ def test_func(s: str):
     return
 
 
-# test_func(t1)
-test_func(t5)
-# test_func(t3)
+solve(t1)
 
 # timing_1 = perf_counter()
 # answer_1 = solve(test)
