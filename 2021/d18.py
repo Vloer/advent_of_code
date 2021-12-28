@@ -33,9 +33,12 @@ t1 = [
 '[[[5,[7,4]],7],1]', 
 '[[[[4,2],2],6],[8,7]]'
 ]
+t2 = '[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]'
+t3 = '[[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,8]],[[7,9],[5,0]]]],[[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]]'
+t7 = '[[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]]'
 
 
-def depth(s: str) -> int | int:
+def depth(s: str | list) -> int | int:
     depth = 0
     max_depth = 0
     max_depth_start_location = None
@@ -51,9 +54,30 @@ def depth(s: str) -> int | int:
     return max_depth, max_depth_start_location
 
 
-def get_deepest():
-    return
 
+def check_reduce_again(s: str) -> bool:
+    d = depth(s)[0]
+    s_list = '[' + s.replace('[', '').replace(']', '') + ']'
+    list_of_numbers = eval(s_list)
+    if (d > 4) or any([x > 9 for x in list_of_numbers]):
+        return True
+    return False
+
+
+def listify(s: str) -> list[str]:
+    l = []
+    continue_next = False
+    for i, c in enumerate(s[1:]):
+        if continue_next:
+            continue_next = False
+            continue
+        if s[i] in ['[',']',','] or c in ['[',']',',']:
+            l.append(s[i])
+        else:
+            l.append(s[i]+c)
+            continue_next = True
+    l.append(c)
+    return l
 
 class List:
     def __init__(self, data, parent=None, d=0):
@@ -83,36 +107,18 @@ def split(s: str) -> str:
     s_list = '[' + s.replace('[', '').replace(']', '') + ']'
     list_of_numbers = eval(s_list)
     for num in list_of_numbers:
-        if num > 10:
+        if num > 9:
             rounded = num // 2
             new_num = [rounded, rounded + 1]
             idx = s.index(str(num))
             s = s[:idx] + str(new_num).replace(' ', '') + s[idx+2:]
-            list_of_numbers.remove(num)
-            if any([x > 10 for x in list_of_numbers]):
-                s = split(s)
             break
     return s
 
 
 def explode(s: str):
-    l = []
-    continue_next = False
-    for i, c in enumerate(s[1:]):
-        if continue_next:
-            continue_next = False
-            continue
-        if s[i] in ['[',']',',']:
-            l.append(s[i])
-        else:
-            if c in ['[',']',',']:
-                l.append(s[i])
-            else:
-                l.append(s[i]+c)
-                continue_next = True
-    
-
-    loc = depth(s)[1]
+    l = listify(s)
+    loc = depth(l)[1]
     if not loc:
         return s
     loc_1 = loc_2 = loc
@@ -123,28 +129,25 @@ def explode(s: str):
     i = 1
     while i < loc:
         c = l[loc-i]
-        if c not in ['[', ']', ',']:  # is number
+        if c not in ['[', ']', ',']: 
             res = int(c) + left_num
             l[loc-i] = str(res)
-            if res > 10:
-                loc_1 += 1
             break
         i += 1
-    # Change first number to the left
-    j = 5
-    while loc + j < len(s):
+    # Change first number to the right
+    j = 4
+    while loc + j < len(l):
         c = l[loc+j]
         if c not in ['[', ']', ',']:
             res = int(c) + right_num
             l[loc+j] = str(res)
-            if res > 10:
-                loc_2 += 1
             break
         j += 1
-    l = ''.join(l)
+    l1 = ''.join(l[:loc_1])
+    l2 = ''.join(l[loc_2+5:])
 
     # Replace deepest nest with 0
-    s = l[:loc_1] + '0' + l[loc_2+5:]
+    s = l1 + '0' + l2
     if depth(s)[0] > 4:
         s = explode(s)
     return s
@@ -153,8 +156,7 @@ def explode(s: str):
 def reduce(s: str) -> str:
     s = explode(s)
     s = split(s)
-    d = depth(s)[0]
-    if d > 4:
+    if check_reduce_again(s):
         s = reduce(s)
     return s
 
@@ -179,6 +181,7 @@ def test_func(s: str):
 
 
 solve(t1)
+# test_func(t2)
 
 # timing_1 = perf_counter()
 # answer_1 = solve(test)
