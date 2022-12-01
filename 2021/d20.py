@@ -29,7 +29,8 @@ def create_input_image(data: list) -> np.array:
         original = np.array([[y == '#' for y in x] for x in data], dtype=int)
     else:
         original = data
-    base = np.zeros((np.shape(original)[0] + 4, np.shape(original)[1] + 4), dtype=int)
+    base = np.zeros(
+        (np.shape(original)[0] + 4, np.shape(original)[1] + 4), dtype=int)
     base[2:np.shape(base)[0]-2, 2:np.shape(base)[1]-2] = original
     return base
 
@@ -54,6 +55,7 @@ def create_output_image(input_image: np.array, algorithm: np.array) -> np.array:
             value = get_pixel_value(input_image, (y, x))
             image[y, x] = algorithm[value]
     return image
+
 
 def shrink_output_image(image: np.array, shrink: int) -> np.array:
     return image[shrink:np.shape(image)[0]-shrink, shrink:np.shape(image)[1]-shrink]
