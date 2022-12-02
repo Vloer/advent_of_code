@@ -5,15 +5,15 @@ from time import perf_counter
 input_file = Path(__file__).parent / "inputs" / "d2.txt"
 
 
-def parse_input(txt_file: str = input_file) -> list[int]:
+def parse_input(txt_file: str = input_file) -> list[str]:
     with open(txt_file, 'r') as f:
-        return(f.read().split("\n"))
+        return f.read().split("\n")
 
 
 inp = parse_input()
 
 
-def solve(data: list[int], result: int = 0, part1=True) -> int:
+def solve(data: list[str], result: int = 0, part1=True) -> int:
     return result
 
 
