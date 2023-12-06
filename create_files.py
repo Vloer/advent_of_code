@@ -1,7 +1,8 @@
 from pathlib import Path
 import shutil
 
-root = Path(__file__)
+root = Path(__file__).parent
+
 year = None
 if not year:
     year = input('Enter year: ')
