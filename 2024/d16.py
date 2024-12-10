@@ -12,7 +12,7 @@ def timer(func: Callable) -> Callable:
         result = func(*args, **kwargs)
         end_time = time.perf_counter()
         execution_time = end_time - start_time
-        print(f"Function '{func.__name__}' took {execution_time:.4f} seconds to execute")
+        print(f"Function '{func.__name__}' took {execution_time:.4f} seconds to execute and returned {result}")
         return result
 
     return wrapper
@@ -30,11 +30,15 @@ inp = parse_input()
 test = """""".split('\n')
 
 
-def solve(data: list[str], result: int = 0, part1=True) -> int:
+@timer
+def solve1(data: list[str], result: int = 0) -> int:
+    return result
+
+@timer
+def solve2(data: list[str], result: int = 0) -> int:
     return result
 
 
-answer_1 = solve(test)
-print(f"Answer 1: {answer_1}")
-answer_2 = solve(test, part1=False)
-print(f"Answer 2: {answer_2}")
+
+answer_1 = solve1(inp)
+answer_2 = solve2(inp)
