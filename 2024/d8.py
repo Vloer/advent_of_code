@@ -19,11 +19,11 @@ def timer(func: Callable) -> Callable:
     return wrapper
 
 
-input_file = Path(__file__).parent / "inputs" / f'{Path(__file__).stem}.txt'
+input_file = Path(__file__).parent / "inputs" / f"{Path(__file__).stem}.txt"
 
 
 def parse_input(txt_file: str = input_file) -> str:
-    with open(txt_file, 'r') as f:
+    with open(txt_file, "r") as f:
         return f.read()
 
 
@@ -44,13 +44,13 @@ test = """............
 
 @timer
 def solve1(data: str, result: int = 0) -> int:
-    data = [[x for x in r] for r in data.split('\n')]
+    data = [[x for x in r] for r in data.split("\n")]
     nodes = defaultdict(list)
 
     # Find nodes
     for i, row in enumerate(data):
         for j, col in enumerate(row):
-            if col in ['.', '#']:
+            if col in [".", "#"]:
                 continue
             nodes[col].append((i, j))
 
@@ -90,11 +90,11 @@ def solve1(data: str, result: int = 0) -> int:
 
 @timer
 def solve2(data: str) -> int:
-    data = [[x for x in r] for r in data.split('\n')]
+    data = [[x for x in r] for r in data.split("\n")]
     nodes = defaultdict(list)
     for i, row in enumerate(data):
         for j, col in enumerate(row):
-            if col in ['.', '#']:
+            if col in [".", "#"]:
                 continue
             nodes[col].append((i, j))
 
@@ -123,8 +123,8 @@ def solve2(data: str) -> int:
 def print_grid(grid, antinodes):
     for n in antinodes:
         r, c = n
-        if grid[r][c] == '.':
-            grid[r][c] = '#'
+        if grid[r][c] == ".":
+            grid[r][c] = "#"
     for i, row in enumerate(grid):
         print(f"{str(i):<3}: {' '.join(row)}")
 
