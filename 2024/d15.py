@@ -23,15 +23,27 @@ input_file = Path(__file__).parent / "inputs" / f'{Path(__file__).stem}.txt'
 
 def parse_input(txt_file: str = input_file) -> list[str]:
     with open(txt_file, 'r') as f:
-        return f.read().split("\n")
+        return f.read().split("\n\n")
 
 
 inp = parse_input()
-test = """""".split('\n')
+test = """########
+#..O.O.#
+##@.O..#
+#...O..#
+#.#.O..#
+#...O..#
+#......#
+########
+
+<^^>>>vv<v>>v<<""".split('\n\n')
 
 
 @timer
 def solve1(data: list[str], result: int = 0) -> int:
+    grid, instructions = data
+    for inst in instructions.split('\n'):
+        ...
     return result
 
 @timer
@@ -40,5 +52,5 @@ def solve2(data: list[str], result: int = 0) -> int:
 
 
 
-answer_1 = solve1(inp)
+answer_1 = solve1(test)
 answer_2 = solve2(inp)
